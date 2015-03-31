@@ -53,6 +53,22 @@ const uint8_t crc8_atm_table[256] = {
 void constructor(void) {
 	_Static_assert(sizeof(BrickContext) <= BRICKLET_CONTEXT_MAX_SIZE, "BrickContext too big");
 
+	PIN_SDO.type = PIO_INPUT;
+	PIN_SDO.attribute = PIO_DEFAULT;
+	BA->PIO_Configure(&PIN_SDO, 1);
+
+	PIN_SDI.type = PIO_OUTPUT_0;
+	PIN_SDI.attribute = PIO_DEFAULT;
+	BA->PIO_Configure(&PIN_SDI, 1);
+
+	PIN_CLK.type = PIO_OUTPUT_1;
+	PIN_CLK.attribute = PIO_DEFAULT;
+	BA->PIO_Configure(&PIN_CLK, 1);
+
+	PIN_LAT.type = PIO_OUTPUT_1;
+	PIN_LAT.attribute = PIO_DEFAULT;
+	BA->PIO_Configure(&PIN_LAT, 1);
+
 	BC->counter = 0;
 	BC->input_voltage_sum = 0;
 
@@ -127,23 +143,35 @@ void update(void) {
 }
 
 void dac7760_write_register(const uint8_t reg, const uint16_t data) {
+	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
+
 	uint8_t write_data[4] = {reg, data >> 8, data & 0xFF};
 	write_data[3] = crc8_atm(write_data, 3);
 
 	for(uint8_t i = 0; i < 4; i++) {
 		spibb_transceive_byte(write_data[i]);
 	}
+
+	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch high
 }
 
 bool dac7760_read_register(const uint8_t reg, uint16_t *data) {
+	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
+
 	uint8_t read_data[3];
 	spibb_transceive_byte(REG_READ);
 	spibb_transceive_byte(REG_NOP);
 	spibb_transceive_byte(reg);
 
+	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch high
+	SLEEP_NS(100);
+	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
+
 	for(uint8_t i = 0; i < 3; i++) {
 		read_data[i] = spibb_transceive_byte(REG_NOP);
 	}
+
+	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch high
 
 	*data = read_data[0] << 8;
 	*data |= read_data[1];
