@@ -39,15 +39,20 @@
 
 #define BRICKLET_DEVICE_IDENTIFIER 258
 
+#define PIN_SDI (BS->pin1_ad)
+#define PIN_SDO (BS->pin2_da)
+#define PIN_CLK (BS->pin3_pwm)
+#define PIN_LAT (BS->pin4_io)
+
+#define BOARD_MCK 64000000
+
 #define MAX_ADC_VALUE ((1  << 12) - 1)
 #define MAX_VOLTAGE 3300
 
 #define LOGGING_LEVEL LOGGING_DEBUG
-#define DEBUG_BRICKLET 0
+#define DEBUG_BRICKLET 1
 
 #define INVOCATION_IN_BRICKLET_CODE
-
-#define PIN_REF_VOLTAGE (BS->pin1_ad)
 
 typedef struct {
 	uint32_t last_input_voltage_sum;

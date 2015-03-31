@@ -25,15 +25,19 @@
 #include <stdint.h>
 #include "bricklib/com/com_common.h"
 
-#define ANALOG_MAX_VOLTAGE 12000
+#define REG_NOP            0x00
+#define REG_WRITE_DAC      0x01
+#define REG_READ           0x02
+#define REG_WRITE_CONTROL  0x55
+#define REG_WRITE_RESET    0x56
+#define REG_WRITE_CONFIG   0x67
+#define REG_WRITE_CAL_GAIN 0x68
+#define REG_WRITE_CAL_ZERO 0x69
+#define REG_RESET_WATCHDOG 0x95
 
-#define I2C_EEPROM_ADDRESS_HIGH 84
-#define I2C_ADDRESS_HIGH 97 //0b1100001
-#define I2C_ADDRESS_LOW 96 //0b1100000
-
-#define FID_SET_OUTPUT_VOLTAGE          1
-#define FID_GET_OUTPUT_VOLTAGE          2
-#define FID_GET_INPUT_VOLTAGE           3
+#define FID_SET_OUTPUT_VOLTAGE 1
+#define FID_GET_OUTPUT_VOLTAGE 2
+#define FID_GET_INPUT_VOLTAGE  3
 
 typedef struct {
 	MessageHeader header;
@@ -65,6 +69,11 @@ typedef struct {
 void set_output_voltage(const ComType com, const SetOutputVoltage *data);
 void get_output_voltage(const ComType com, const GetOutputVoltage *data);
 void get_input_voltage(const ComType com, const GetInputVoltage *data);
+
+void dac7760_write_register(const uint8_t reg, const uint16_t data);
+bool dac7760_read_register(const uint8_t reg, uint16_t *data);
+uint8_t spibb_transceive_byte(const uint8_t value);
+uint8_t crc8_atm(uint8_t *buf, uint8_t len);
 
 void invocation(const ComType com, const uint8_t *data);
 void constructor(void);
