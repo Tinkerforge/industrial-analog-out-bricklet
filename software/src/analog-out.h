@@ -25,6 +25,12 @@
 #include <stdint.h>
 #include "bricklib/com/com_common.h"
 
+#define RANGE_VOLTAGE_0_TO_5    0
+#define RANGE_VOLTAGE_0_TO_10   1
+#define RANGE_CURRENT_4_TO_20   0
+#define RANGE_CURRENT_0_TO_20   1
+#define RANGE_CURRENT_0_TO_24   2
+
 #define REG_NOP            0x00
 #define REG_WRITE_DAC      0x01
 #define REG_READ           0x02
@@ -35,9 +41,12 @@
 #define REG_WRITE_CAL_ZERO 0x69
 #define REG_RESET_WATCHDOG 0x95
 
-#define FID_SET_OUTPUT_VOLTAGE 1
-#define FID_GET_OUTPUT_VOLTAGE 2
-#define FID_GET_INPUT_VOLTAGE  3
+#define FID_SET_VOLTAGE 1
+#define FID_GET_VOLTAGE 2
+#define FID_SET_CURRENT 3
+#define FID_GET_CURRENT 4
+#define FID_SET_CONFIGURATION 5
+#define FID_GET_CONFIGURATION 6
 
 typedef struct {
 	MessageHeader header;
@@ -46,29 +55,54 @@ typedef struct {
 typedef struct {
 	MessageHeader header;
 	uint16_t voltage;
-} __attribute__((__packed__)) SetOutputVoltage;
+} __attribute__((__packed__)) SetVoltage;
 
 typedef struct {
 	MessageHeader header;
-} __attribute__((__packed__)) GetOutputVoltage;
-
-typedef struct {
-	MessageHeader header;
-	uint16_t voltage;
-} __attribute__((__packed__)) GetOutputVoltageReturn;
-
-typedef struct {
-	MessageHeader header;
-} __attribute__((__packed__)) GetInputVoltage;
+} __attribute__((__packed__)) GetVoltage;
 
 typedef struct {
 	MessageHeader header;
 	uint16_t voltage;
-} __attribute__((__packed__)) GetInputVoltageReturn;
+} __attribute__((__packed__)) GetVoltageReturn;
 
-void set_output_voltage(const ComType com, const SetOutputVoltage *data);
-void get_output_voltage(const ComType com, const GetOutputVoltage *data);
-void get_input_voltage(const ComType com, const GetInputVoltage *data);
+typedef struct {
+	MessageHeader header;
+	uint16_t current;
+} __attribute__((__packed__)) SetCurrent;
+
+typedef struct {
+	MessageHeader header;
+} __attribute__((__packed__)) GetCurrent;
+
+typedef struct {
+	MessageHeader header;
+	uint16_t current;
+} __attribute__((__packed__)) GetCurrentReturn;
+
+typedef struct {
+	MessageHeader header;
+	uint8_t voltage_range;
+	uint8_t current_range;
+} __attribute__((__packed__)) SetConfiguration;
+
+typedef struct {
+	MessageHeader header;
+} __attribute__((__packed__)) GetConfiguration;
+
+typedef struct {
+	MessageHeader header;
+	uint8_t voltage_range;
+	uint8_t current_range;
+} __attribute__((__packed__)) GetConfigurationReturn;
+
+
+void set_voltage(const ComType com, const SetVoltage *data);
+void get_voltage(const ComType com, const GetVoltage *data);
+void set_current(const ComType com, const SetCurrent *data);
+void get_current(const ComType com, const GetCurrent *data);
+void set_configuration(const ComType com, const SetConfiguration *data);
+void get_configuration(const ComType com, const GetConfiguration *data);
 
 void dac7760_write_register(const uint8_t reg, const uint16_t data);
 bool dac7760_read_register(const uint8_t reg, uint16_t *data);
@@ -80,6 +114,11 @@ void constructor(void);
 void destructor(void);
 void tick(const uint8_t tick_type);
 
-void update(void);
+void update_voltage_by_value(void);
+void update_current_by_value(void);
+void update_value_by_voltage(uint16_t voltage);
+void update_value_by_current(uint16_t current);
+void update_configuration(void);
+void update_dac(void);
 
 #endif

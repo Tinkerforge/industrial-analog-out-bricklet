@@ -55,11 +55,12 @@
 #define INVOCATION_IN_BRICKLET_CODE
 
 typedef struct {
-	uint32_t last_input_voltage_sum;
-	uint32_t input_voltage_sum;
-	uint8_t counter;
+	uint16_t voltage;
+	uint16_t current;
+	uint16_t value;
 
-	uint16_t last_output_voltage;
+	uint8_t voltage_range;
+	uint8_t current_range;
 } BrickContext;
 
 #endif

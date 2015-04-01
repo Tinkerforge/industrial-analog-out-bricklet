@@ -31,6 +31,9 @@
 
 #include "config.h"
 
+#define MIN_DAC 0
+#define MAX_DAC 4095
+
 const uint8_t crc8_atm_table[256] = {
 	  0,   7,  14,   9,  28,  27,  18,  21,  56,  63,  54,  49,  36,  35,  42,  45,
 	112, 119, 126, 121, 108, 107,  98, 101,  72,  79,  70,  65,  84,  83,  90,  93,
@@ -69,10 +72,12 @@ void constructor(void) {
 	PIN_LAT.attribute = PIO_DEFAULT;
 	BA->PIO_Configure(&PIN_LAT, 1);
 
-	BC->counter = 0;
-	BC->input_voltage_sum = 0;
+	BC->voltage = 0;
+	BC->current = 0;
+	BC->voltage_range = RANGE_VOLTAGE_0_TO_10;
+	BC->current_range = RANGE_CURRENT_4_TO_20;
 
-	update();
+	update_dac();
 }
 
 void destructor(void) {
@@ -80,18 +85,33 @@ void destructor(void) {
 
 void invocation(const ComType com, const uint8_t *data) {
 	switch(((StandardMessage*)data)->header.fid) {
-		case FID_SET_OUTPUT_VOLTAGE: {
-			set_output_voltage(com, (SetOutputVoltage*)data);
+		case FID_SET_VOLTAGE: {
+			set_voltage(com, (SetVoltage*)data);
 			break;
 		}
 
-		case FID_GET_OUTPUT_VOLTAGE: {
-			get_output_voltage(com, (GetOutputVoltage*)data);
+		case FID_GET_VOLTAGE: {
+			get_voltage(com, (GetVoltage*)data);
 			break;
 		}
 
-		case FID_GET_INPUT_VOLTAGE: {
-			get_input_voltage(com, (GetInputVoltage*)data);
+		case FID_SET_CURRENT: {
+			set_current(com, (SetCurrent*)data);
+			break;
+		}
+
+		case FID_GET_CURRENT: {
+			get_current(com, (GetCurrent*)data);
+			break;
+		}
+
+		case FID_SET_CONFIGURATION: {
+			set_configuration(com, (SetConfiguration*)data);
+			break;
+		}
+
+		case FID_GET_CONFIGURATION: {
+			get_configuration(com, (GetConfiguration*)data);
 			break;
 		}
 
@@ -108,38 +128,152 @@ void tick(const uint8_t tick_type) {
 	}
 }
 
-void set_output_voltage(const ComType com, const SetOutputVoltage *data) {
-	BC->last_output_voltage = data->voltage;
-	update();
+void update_voltage_by_value(void) {
+	switch(BC->voltage_range) {
+		case RANGE_VOLTAGE_0_TO_5: {
+			BC->voltage = SCALE(BC->value, MIN_DAC, MAX_DAC, 0, 5000);
+			break;
+		}
 
-	logbli("set_output_voltage: %d\n\r", data->voltage);
+		case RANGE_VOLTAGE_0_TO_10: {
+			BC->voltage = SCALE(BC->value, MIN_DAC, MAX_DAC, 0, 10000);
+			break;
+		}
+	}
+}
+
+void update_current_by_value(void) {
+	switch(BC->current_range) {
+		case RANGE_CURRENT_4_TO_20: {
+			BC->current = SCALE(BC->value, MIN_DAC, MAX_DAC, 4000, 20000);
+			break;
+		}
+
+		case RANGE_CURRENT_0_TO_20: {
+			BC->current = SCALE(BC->value, MIN_DAC, MAX_DAC, 0, 20000);
+			break;
+		}
+
+		case RANGE_CURRENT_0_TO_24: {
+			BC->current = SCALE(BC->value, MIN_DAC, MAX_DAC, 0, 24000);
+			break;
+		}
+	}
+}
+
+void update_value_by_voltage(uint16_t voltage) {
+	switch(BC->voltage_range) {
+		case RANGE_VOLTAGE_0_TO_5: {
+			BC->voltage = BETWEEN(0, voltage, 5000);
+			BC->value = SCALE(BC->voltage, 0, 5000, MIN_DAC, MAX_DAC);
+			break;
+		}
+
+		case RANGE_VOLTAGE_0_TO_10: {
+			BC->voltage = BETWEEN(0, voltage, 5000);
+			BC->value = SCALE(BC->voltage, 0, 10000, MIN_DAC, MAX_DAC);
+			break;
+		}
+	}
+
+	update_current_by_value();
+}
+
+void update_value_by_current(uint16_t current) {
+	switch(BC->current_range) {
+		case RANGE_CURRENT_4_TO_20: {
+			BC->current = BETWEEN(4000, current, 20000);
+			BC->value = SCALE(BC->current, 4000, 20000, MIN_DAC, MAX_DAC);
+			break;
+		}
+
+		case RANGE_CURRENT_0_TO_20: {
+			BC->current = BETWEEN(0, current, 20000);
+			BC->value = SCALE(BC->current, 0, 20000, MIN_DAC, MAX_DAC);
+			break;
+		}
+
+		case RANGE_CURRENT_0_TO_24: {
+			BC->current = BETWEEN(0, current, 24000);
+			BC->value = SCALE(BC->current, 0, 24000, MIN_DAC, MAX_DAC);
+			break;
+		}
+	}
+
+	update_voltage_by_value();
+}
+
+void set_voltage(const ComType com, const SetVoltage *data) {
+	update_value_by_voltage(data->voltage);
+	update_dac();
+
+	logbli("set_voltage: %d (vol) -> %d (val)\n\r", BC->voltage, BC->value);
 
 	BA->com_return_setter(com, data);
 }
 
-void get_output_voltage(const ComType com, const GetOutputVoltage *data) {
-	GetOutputVoltageReturn govr;
-	govr.header        = data->header;
-	govr.header.length = sizeof(GetOutputVoltageReturn);
-	govr.voltage       = BC->last_output_voltage;
+void get_voltage(const ComType com, const GetVoltage *data) {
+	GetVoltageReturn gvr;
+	gvr.header        = data->header;
+	gvr.header.length = sizeof(GetVoltageReturn);
+	gvr.voltage       = BC->voltage;
 
-	BA->send_blocking_with_timeout(&govr, sizeof(GetOutputVoltageReturn), com);
-	logbli("get_output_voltage: %d\n\r", govr.voltage);
+	BA->send_blocking_with_timeout(&gvr, sizeof(GetVoltageReturn), com);
+	logbli("get_voltage: %d\n\r", gvr.voltage);
 }
 
-void get_input_voltage(const ComType com, const GetInputVoltage *data) {
-	GetInputVoltageReturn givr;
-	givr.header        = data->header;
-	givr.header.length = sizeof(GetInputVoltageReturn);
-	// voltage = input*3300*(68+22)/(4095*22*256) = input*75/5824
-	givr.voltage       = BC->last_input_voltage_sum*75/5824;
+void set_current(const ComType com, const SetCurrent *data) {
+	update_value_by_current(data->current);
+	update_dac();
 
-	BA->send_blocking_with_timeout(&givr, sizeof(GetInputVoltageReturn), com);
-	logbli("get_input_voltage: %d\n\r", givr.voltage);
+	logbli("set_current: %d (cur) -> %d (val)\n\r", BC->current, BC->value);
+	BA->com_return_setter(com, data);
 }
 
-void update(void) {
-	dac7760_write_register(REG_WRITE_DAC, BC->last_output_voltage);
+void get_current(const ComType com, const GetCurrent *data) {
+	GetCurrentReturn gcr;
+	gcr.header        = data->header;
+	gcr.header.length = sizeof(GetCurrentReturn);
+	gcr.current       = BC->current;
+
+	BA->send_blocking_with_timeout(&gcr, sizeof(GetCurrentReturn), com);
+	logbli("get_current: %d\n\r", gcr.current);
+}
+
+void set_configuration(const ComType com, const SetConfiguration *data) {
+	if((data->voltage_range > RANGE_VOLTAGE_0_TO_10) || (data->current_range > RANGE_CURRENT_0_TO_24)) {
+		BA->com_return_error(data, sizeof(MessageHeader), MESSAGE_ERROR_CODE_INVALID_PARAMETER, com);
+		return;
+	}
+
+	BC->voltage_range = data->voltage_range;
+	BC->current_range = data->current_range;
+
+	update_configuration();
+	update_voltage_by_value();
+	update_current_by_value();
+
+	logbli("set_configuration: %d (cur range), %d (vol range)\n\r", data->current_range, data->voltage_range);
+	BA->com_return_setter(com, data);
+}
+
+void get_configuration(const ComType com, const GetConfiguration *data) {
+	GetConfigurationReturn gcr;
+	gcr.header        = data->header;
+	gcr.header.length = sizeof(GetConfigurationReturn);
+	gcr.current_range = BC->current_range;
+	gcr.voltage_range = BC->voltage_range;
+
+	BA->send_blocking_with_timeout(&gcr, sizeof(GetConfigurationReturn), com);
+	logbli("get_configuration: %d (cur range), %d (vol range)\n\r", gcr.current_range, gcr.voltage_range);
+}
+
+void update_configuration(void) {
+	// TODO
+}
+
+void update_dac(void) {
+	dac7760_write_register(REG_WRITE_DAC, BC->value);
 }
 
 void dac7760_write_register(const uint8_t reg, const uint16_t data) {
@@ -164,7 +298,7 @@ bool dac7760_read_register(const uint8_t reg, uint16_t *data) {
 	spibb_transceive_byte(reg);
 
 	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch high
-	SLEEP_NS(100);
+	SLEEP_NS(100); // Minimum of 40ns according to datasheet
 	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
 
 	for(uint8_t i = 0; i < 3; i++) {
