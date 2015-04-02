@@ -73,7 +73,7 @@ void constructor(void) {
 	BA->PIO_Configure(&PIN_LAT, 1);
 
 	BC->voltage = 0;
-	BC->current = 0;
+	BC->current = 4000;
 	BC->voltage_range = RANGE_VOLTAGE_0_TO_10;
 	BC->current_range = RANGE_CURRENT_4_TO_20;
 
