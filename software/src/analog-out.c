@@ -86,6 +86,7 @@ void constructor(void) {
 	}
 	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch high
 
+	update_configuration();
 	update_dac();
 }
 
