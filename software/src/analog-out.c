@@ -76,6 +76,15 @@ void constructor(void) {
 	BC->current = 4000;
 	BC->voltage_range = RANGE_VOLTAGE_0_TO_10;
 	BC->current_range = RANGE_CURRENT_4_TO_20;
+	BC->enabled = false;
+
+	// Enable CRC and DUAL OUT (without sending CRC as fourth byte)
+	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
+	uint8_t write_data[3] = {REG_WRITE_CONFIG, 1 << 0, 1 << 3};
+	for(uint8_t i = 0; i < 3; i++) {
+		spibb_transceive_byte(write_data[i]);
+	}
+	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch high
 
 	update_dac();
 }
@@ -85,6 +94,21 @@ void destructor(void) {
 
 void invocation(const ComType com, const uint8_t *data) {
 	switch(((StandardMessage*)data)->header.fid) {
+		case FID_ENABLE: {
+			enable(com, (Enable*)data);
+			break;
+		}
+
+		case FID_DISABLE: {
+			disable(com, (Disable*)data);
+			break;
+		}
+
+		case FID_IS_ENABLED: {
+			is_enabled(com, (IsEnabled*)data);
+			break;
+		}
+
 		case FID_SET_VOLTAGE: {
 			set_voltage(com, (SetVoltage*)data);
 			break;
@@ -203,6 +227,28 @@ void update_value_by_current(uint16_t current) {
 	update_voltage_by_value();
 }
 
+void enable(const ComType com, const Enable *data) {
+	BC->enabled = true;
+	update_configuration();
+	logbli("enable\n\r");
+}
+
+void disable(const ComType com, const Disable *data) {
+	BC->enabled = false;
+	update_configuration();
+	logbli("disable\n\r");
+}
+
+void is_enabled(const ComType com, const IsEnabled *data) {
+	IsEnabledReturn ier;
+	ier.header        = data->header;
+	ier.header.length = sizeof(IsEnabledReturn);
+	ier.enabled       = BC->enabled;
+
+	BA->send_blocking_with_timeout(&ier, sizeof(IsEnabledReturn), com);
+	logbli("is_enabled: %d\n\r", ier.enabled);
+}
+
 void set_voltage(const ComType com, const SetVoltage *data) {
 	update_value_by_voltage(data->voltage);
 	update_dac();
@@ -269,7 +315,13 @@ void get_configuration(const ComType com, const GetConfiguration *data) {
 }
 
 void update_configuration(void) {
-	// TODO
+	// Enable DUAL OUTEN, CRC and set IOUT RANGE
+	const uint16_t value_config = (1 << 3) | (1 << 8) | ((BC->current_range+1) << 9);
+	dac7760_write_register(REG_WRITE_CONFIG, value_config);
+
+	// Enable/Disable output and set VOUT RANGE
+	const uint16_t value_control = (1 << BC->enabled) | BC->voltage_range;
+	dac7760_write_register(REG_WRITE_CONTROL, value_control);
 }
 
 void update_dac(void) {

@@ -61,6 +61,8 @@ typedef struct {
 
 	uint8_t voltage_range;
 	uint8_t current_range;
+
+	bool enabled;
 } BrickContext;
 
 #endif

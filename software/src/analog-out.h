@@ -41,16 +41,36 @@
 #define REG_WRITE_CAL_ZERO 0x69
 #define REG_RESET_WATCHDOG 0x95
 
-#define FID_SET_VOLTAGE 1
-#define FID_GET_VOLTAGE 2
-#define FID_SET_CURRENT 3
-#define FID_GET_CURRENT 4
-#define FID_SET_CONFIGURATION 5
-#define FID_GET_CONFIGURATION 6
+#define FID_ENABLE            1
+#define FID_DISABLE           2
+#define FID_IS_ENABLED        3
+#define FID_SET_VOLTAGE       4
+#define FID_GET_VOLTAGE       5
+#define FID_SET_CURRENT       6
+#define FID_GET_CURRENT       7
+#define FID_SET_CONFIGURATION 8
+#define FID_GET_CONFIGURATION 9
 
 typedef struct {
 	MessageHeader header;
 } __attribute__((__packed__)) StandardMessage;
+
+typedef struct {
+	MessageHeader header;
+} __attribute__((__packed__)) Enable;
+
+typedef struct {
+	MessageHeader header;
+} __attribute__((__packed__)) Disable;
+
+typedef struct {
+	MessageHeader header;
+} __attribute__((__packed__)) IsEnabled;
+
+typedef struct {
+	MessageHeader header;
+	bool enabled;
+} __attribute__((__packed__)) IsEnabledReturn;
 
 typedef struct {
 	MessageHeader header;
@@ -97,6 +117,9 @@ typedef struct {
 } __attribute__((__packed__)) GetConfigurationReturn;
 
 
+void enable(const ComType com, const Enable *data);
+void disable(const ComType com, const Disable *data);
+void is_enabled(const ComType com, const IsEnabled *data);
 void set_voltage(const ComType com, const SetVoltage *data);
 void get_voltage(const ComType com, const GetVoltage *data);
 void set_current(const ComType com, const SetCurrent *data);
