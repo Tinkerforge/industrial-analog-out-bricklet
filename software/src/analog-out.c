@@ -90,10 +90,6 @@ void constructor(void) {
 
 	update_configuration();
 	update_dac();
-
-	uint16_t config;
-	dac7760_read_register(0b1011, &config);
-	BA->printf("config: %x\n\r", config);
 }
 
 void destructor(void) {
