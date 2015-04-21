@@ -80,11 +80,12 @@ void constructor(void) {
 
 	// Enable CRC and DUAL OUT (without sending CRC as fourth byte)
 	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
-	uint8_t write_data[3] = {REG_WRITE_CONFIG, 1 << 0, 1 << 3};
+	uint8_t write_data[3] = {REG_WRITE_CONFIG, 1 << 0, 0/*1 << 3*/};
 	for(uint8_t i = 0; i < 3; i++) {
 		spibb_transceive_byte(write_data[i]);
 	}
-	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch high
+	PIN_LAT.pio->PIO_SODR = PIN_LAT.mask; // latch high
+	SLEEP_NS(50);
 
 	update_configuration();
 	update_dac();
@@ -195,7 +196,7 @@ void update_value_by_voltage(uint16_t voltage) {
 		}
 
 		case RANGE_VOLTAGE_0_TO_10: {
-			BC->voltage = BETWEEN(0, voltage, 5000);
+			BC->voltage = BETWEEN(0, voltage, 10000);
 			BC->value = SCALE(BC->voltage, 0, 10000, MIN_DAC, MAX_DAC);
 			break;
 		}
@@ -317,16 +318,16 @@ void get_configuration(const ComType com, const GetConfiguration *data) {
 
 void update_configuration(void) {
 	// Enable DUAL OUTEN, CRC and set IOUT RANGE
-	const uint16_t value_config = (1 << 3) | (1 << 8) | ((BC->current_range+1) << 9);
+	const uint16_t value_config = /*(1 << 3) |*/ (1 << 8) | ((BC->current_range+1) << 9);
 	dac7760_write_register(REG_WRITE_CONFIG, value_config);
 
 	// Enable/Disable output and set VOUT RANGE
-	const uint16_t value_control = (1 << BC->enabled) | BC->voltage_range;
+	const uint16_t value_control = (BC->enabled ? (1 << 12) : 0) | BC->voltage_range;
 	dac7760_write_register(REG_WRITE_CONTROL, value_control);
 }
 
 void update_dac(void) {
-	dac7760_write_register(REG_WRITE_DAC, BC->value);
+	dac7760_write_register(REG_WRITE_DAC, BC->value << 4);
 }
 
 void dac7760_write_register(const uint8_t reg, const uint16_t data) {
@@ -335,38 +336,36 @@ void dac7760_write_register(const uint8_t reg, const uint16_t data) {
 	uint8_t write_data[4] = {reg, data >> 8, data & 0xFF};
 	write_data[3] = crc8_atm(write_data, 3);
 
-	for(uint8_t i = 0; i < 4; i++) {
+	for(uint8_t i = 0; i < /*4*/ 3; i++) {
 		spibb_transceive_byte(write_data[i]);
 	}
 
-	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch high
+	PIN_LAT.pio->PIO_SODR = PIN_LAT.mask; // latch high
+	SLEEP_NS(50);
 }
 
 bool dac7760_read_register(const uint8_t reg, uint16_t *data) {
+//	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
+
+	dac7760_write_register(REG_READ, reg);
 	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
 
-	uint8_t read_data[3];
-	spibb_transceive_byte(REG_READ);
-	spibb_transceive_byte(REG_NOP);
-	spibb_transceive_byte(reg);
-
-	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch high
-	SLEEP_NS(100); // Minimum of 40ns according to datasheet
-	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
-
-	for(uint8_t i = 0; i < 3; i++) {
+	uint8_t read_data[4];
+	for(uint8_t i = 0; i < /*4*/ 3; i++) {
 		read_data[i] = spibb_transceive_byte(REG_NOP);
 	}
 
-	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch high
+	PIN_LAT.pio->PIO_SODR = PIN_LAT.mask; // latch high
+	SLEEP_NS(50);
 
-	*data = read_data[0] << 8;
-	*data |= read_data[1];
+	*data = read_data[1] << 8;
+	*data |= read_data[2];
 
-	uint8_t crc = crc8_atm(read_data, 3);
-	logbli("crc (read, calc): %d %d\n\r", read_data[2], crc);
+	/*uint8_t crc = crc8_atm(read_data, 3);
+	logbli("crc (read, calc): %d %d\n\r", read_data[3], crc);
 
-	return crc == read_data[2];
+	return crc == read_data[3];*/
+	return true;
 }
 
 uint8_t spibb_transceive_byte(const uint8_t value) {
@@ -389,6 +388,10 @@ uint8_t spibb_transceive_byte(const uint8_t value) {
 		SLEEP_US(1);
 	}
 
+	// Make sure clock is low when no data transfer is taking place.
+	// This seems to be necessary? See Page 11 Figure 1.
+	PIN_CLK.pio->PIO_CODR = PIN_CLK.mask;
+
 	return recv;
 }
 
@@ -399,5 +402,5 @@ uint8_t crc8_atm(uint8_t *buf, uint8_t len) {
 		sum = buf[i] ^ crc8_atm_table[sum];
 	}
 
-	return ~sum;
+	return sum;
 }

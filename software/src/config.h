@@ -39,15 +39,15 @@
 
 #define BRICKLET_DEVICE_IDENTIFIER 258
 
-#define PIN_SDI (BS->pin1_ad)
-#define PIN_SDO (BS->pin2_da)
-#define PIN_CLK (BS->pin3_pwm)
-#define PIN_LAT (BS->pin4_io)
+#define PIN_LAT (BS->pin1_ad)
+#define PIN_CLK (BS->pin2_da)
+#define PIN_SDI (BS->pin3_pwm)
+#define PIN_SDO (BS->pin4_io)
 
 #define BOARD_MCK 64000000
 
 #define LOGGING_LEVEL LOGGING_DEBUG
-#define DEBUG_BRICKLET 1
+#define DEBUG_BRICKLET 0
 
 #define INVOCATION_IN_BRICKLET_CODE
 
