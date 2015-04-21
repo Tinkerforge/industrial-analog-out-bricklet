@@ -34,6 +34,7 @@
 #define MIN_DAC 0
 #define MAX_DAC 4095
 
+// x^8 + x^2 + x + 1
 const uint8_t crc8_atm_table[256] = {
 	  0,   7,  14,   9,  28,  27,  18,  21,  56,  63,  54,  49,  36,  35,  42,  45,
 	112, 119, 126, 121, 108, 107,  98, 101,  72,  79,  70,  65,  84,  83,  90,  93,
@@ -80,7 +81,7 @@ void constructor(void) {
 
 	// Enable CRC and DUAL OUT (without sending CRC as fourth byte)
 	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
-	uint8_t write_data[3] = {REG_WRITE_CONFIG, 1 << 0, 0/*1 << 3*/};
+	uint8_t write_data[3] = {REG_WRITE_CONFIG, 1 << 0, 1 << 3};
 	for(uint8_t i = 0; i < 3; i++) {
 		spibb_transceive_byte(write_data[i]);
 	}
@@ -89,6 +90,10 @@ void constructor(void) {
 
 	update_configuration();
 	update_dac();
+
+	uint16_t config;
+	dac7760_read_register(0b1011, &config);
+	BA->printf("config: %x\n\r", config);
 }
 
 void destructor(void) {
@@ -318,7 +323,7 @@ void get_configuration(const ComType com, const GetConfiguration *data) {
 
 void update_configuration(void) {
 	// Enable DUAL OUTEN, CRC and set IOUT RANGE
-	const uint16_t value_config = /*(1 << 3) |*/ (1 << 8) | ((BC->current_range+1) << 9);
+	const uint16_t value_config = (1 << 3) | (1 << 8) | ((BC->current_range+1) << 9);
 	dac7760_write_register(REG_WRITE_CONFIG, value_config);
 
 	// Enable/Disable output and set VOUT RANGE
@@ -336,7 +341,7 @@ void dac7760_write_register(const uint8_t reg, const uint16_t data) {
 	uint8_t write_data[4] = {reg, data >> 8, data & 0xFF};
 	write_data[3] = crc8_atm(write_data, 3);
 
-	for(uint8_t i = 0; i < /*4*/ 3; i++) {
+	for(uint8_t i = 0; i < 4; i++) {
 		spibb_transceive_byte(write_data[i]);
 	}
 
@@ -345,27 +350,23 @@ void dac7760_write_register(const uint8_t reg, const uint16_t data) {
 }
 
 bool dac7760_read_register(const uint8_t reg, uint16_t *data) {
-//	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
-
 	dac7760_write_register(REG_READ, reg);
-	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
 
+	PIN_LAT.pio->PIO_CODR = PIN_LAT.mask; // latch low
 	uint8_t read_data[4];
-	for(uint8_t i = 0; i < /*4*/ 3; i++) {
+	for(uint8_t i = 0; i < 4; i++) {
 		read_data[i] = spibb_transceive_byte(REG_NOP);
 	}
-
 	PIN_LAT.pio->PIO_SODR = PIN_LAT.mask; // latch high
 	SLEEP_NS(50);
 
 	*data = read_data[1] << 8;
 	*data |= read_data[2];
 
-	/*uint8_t crc = crc8_atm(read_data, 3);
+	uint8_t crc = crc8_atm(read_data, 3);
 	logbli("crc (read, calc): %d %d\n\r", read_data[3], crc);
 
-	return crc == read_data[3];*/
-	return true;
+	return crc == read_data[3];
 }
 
 uint8_t spibb_transceive_byte(const uint8_t value) {
@@ -399,7 +400,7 @@ uint8_t crc8_atm(uint8_t *buf, uint8_t len) {
 	uint8_t sum = 0;
 
 	for(uint8_t i = 0; i < len; i++) {
-		sum = buf[i] ^ crc8_atm_table[sum];
+		sum = crc8_atm_table[buf[i] ^ sum];
 	}
 
 	return sum;
