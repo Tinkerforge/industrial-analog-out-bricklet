@@ -36,9 +36,9 @@
 #define REG_READ           0x02
 #define REG_WRITE_CONTROL  0x55
 #define REG_WRITE_RESET    0x56
-#define REG_WRITE_CONFIG   0x67
-#define REG_WRITE_CAL_GAIN 0x68
-#define REG_WRITE_CAL_ZERO 0x69
+#define REG_WRITE_CONFIG   0x57
+#define REG_WRITE_CAL_GAIN 0x58
+#define REG_WRITE_CAL_ZERO 0x59
 #define REG_RESET_WATCHDOG 0x95
 
 #define FID_ENABLE            1
