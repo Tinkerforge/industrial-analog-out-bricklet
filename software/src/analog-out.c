@@ -234,12 +234,16 @@ void enable(const ComType com, const Enable *data) {
 	BC->enabled = true;
 	update_configuration();
 	logbli("enable\n\r");
+
+	BA->com_return_setter(com, data);
 }
 
 void disable(const ComType com, const Disable *data) {
 	BC->enabled = false;
 	update_configuration();
 	logbli("disable\n\r");
+
+	BA->com_return_setter(com, data);
 }
 
 void is_enabled(const ComType com, const IsEnabled *data) {
