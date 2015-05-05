@@ -1,4 +1,4 @@
-update=Do 26 Mär 2015 18:36:27 CET
+update=Mo 04 Mai 2015 17:34:25 CEST
 version=1
 last_client=kicad
 [cvpcb]
@@ -13,26 +13,6 @@ NetType=0
 EquName1=devcms
 [general]
 version=1
-[pcbnew]
-version=1
-PageLayoutDescrFile=
-LastNetListRead=
-UseCmpFile=1
-PadDrill=0.6
-PadDrillOvalY=0.6
-PadSizeH=0.4064
-PadSizeV=1.27
-PcbTextSizeV=1.5
-PcbTextSizeH=1.5
-PcbTextThickness=0.3
-ModuleTextSizeV=1.5
-ModuleTextSizeH=1.5
-ModuleTextSizeThickness=0.15
-SolderMaskClearance=0.2
-SolderMaskMinWidth=0
-DrawSegmentWidth=0.2
-BoardOutlineThickness=0.15
-ModuleOutlineThickness=0.15
 [eeschema]
 version=1
 LibDir=kicad-libraries.pretty
@@ -68,3 +48,23 @@ LibName28=opto
 LibName29=atmel
 LibName30=contrib
 LibName31=valves
+[pcbnew]
+version=1
+PageLayoutDescrFile=
+LastNetListRead=
+UseCmpFile=1
+PadDrill=0
+PadDrillOvalY=0
+PadSizeH=0.45
+PadSizeV=1.75
+PcbTextSizeV=1.5
+PcbTextSizeH=1.5
+PcbTextThickness=0.3
+ModuleTextSizeV=1.5
+ModuleTextSizeH=1.5
+ModuleTextSizeThickness=0.15
+SolderMaskClearance=0
+SolderMaskMinWidth=0
+DrawSegmentWidth=0.2
+BoardOutlineThickness=0.15
+ModuleOutlineThickness=0.15
