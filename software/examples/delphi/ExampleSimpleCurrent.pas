@@ -35,7 +35,7 @@ begin
   ipcon.Connect(HOST, PORT);
   { Don't use device before ipcon is connected }
 
-  { Set a voltage of 4.5mA }
+  { Set a current of 4.5mA }
   ao.SetCurrent(4500);
   ao.Enable();
 

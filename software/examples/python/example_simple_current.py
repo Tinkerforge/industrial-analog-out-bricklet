@@ -15,10 +15,9 @@ if __name__ == "__main__":
     ipcon.connect(HOST, PORT) # Connect to brickd
     # Don't use device before ipcon is connected
 
+    # Set output current of 4.5mA
+    iao.set_current(4500)
     iao.enable()
-
-    # Set output current of 5mA
-    iao.set_current(5000)
 
     raw_input('Press key to exit\n') # Use input() in Python 3
     ipcon.disconnect()
