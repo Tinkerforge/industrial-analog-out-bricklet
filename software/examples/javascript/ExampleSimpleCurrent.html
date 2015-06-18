@@ -41,7 +41,7 @@
 
                 ipcon.on(Tinkerforge.IPConnection.CALLBACK_CONNECTED,
                     function(connectReason) {
-                        //Set output current to 4.5mA
+                        // Set output current to 4.5mA
                         ao.setCurrent(4500);
                         ao.enable();
                     }

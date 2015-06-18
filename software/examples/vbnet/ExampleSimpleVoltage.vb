@@ -14,7 +14,7 @@ Module ExampleSimple
 
         'Set output voltage to 3.3V
         ao.SetVoltage(3300)
-		ao.Enable()
+        ao.Enable()
 
         System.Console.WriteLine("Press key to exit")
         System.Console.ReadLine()

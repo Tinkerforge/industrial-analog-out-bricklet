@@ -6,3 +6,4 @@ uid=XYZ
 
 # set a current of 4.5mA
 tinkerforge call industrial-analog-out-bricklet $uid set-current 4500
+tinkerforge call industrial-analog-out-bricklet $uid enable

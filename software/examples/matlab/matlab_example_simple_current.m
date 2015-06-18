@@ -5,7 +5,7 @@ function matlab_example_simple()
     HOST = 'localhost';
     PORT = 4223;
     UID = 'brY'; % Change to your UID
-    
+
     ipcon = IPConnection(); % Create IP connection
     ao = BrickletIndustrialAnalogOut(UID, ipcon); % Create device object
 
@@ -14,7 +14,7 @@ function matlab_example_simple()
 
     % Set output current to 4.5mA
     ao.setCurrent(4500);
-	ao.enable();
+    ao.enable();
 
     input('Press any key to exit...\n', 's');
     ipcon.disconnect();

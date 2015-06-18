@@ -1,6 +1,6 @@
 function octave_example_simple()
     more off;
-    
+
     HOST = "localhost";
     PORT = 4223;
     UID = "brY"; % Change to your UID
@@ -13,7 +13,7 @@ function octave_example_simple()
 
     % Set output voltage to 3.3V
     ao.setVoltage(3300);
-	ao.enable();
+    ao.enable();
 
     input("Press any key to exit...\n", "s");
     ipcon.disconnect();

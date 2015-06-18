@@ -6,3 +6,4 @@ uid=XYZ
 
 # set a voltage of 3.3V
 tinkerforge call industrial-analog-out-bricklet $uid set-voltage 3300
+tinkerforge call industrial-analog-out-bricklet $uid enable

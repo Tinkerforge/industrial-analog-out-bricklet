@@ -13,8 +13,8 @@ Module ExampleSimple
         ' Don't use device before ipcon is connected
 
         'Set output current to 4.5mA
-        ao.SetCurrent(3300)
-		ao.Enable()
+        ao.SetCurrent(4500)
+        ao.Enable()
 
         System.Console.WriteLine("Press key to exit")
         System.Console.ReadLine()
