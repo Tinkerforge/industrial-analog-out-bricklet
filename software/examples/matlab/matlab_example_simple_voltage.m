@@ -1,4 +1,4 @@
-function matlab_example_simple()
+function matlab_example_simple_voltage()
     import com.tinkerforge.IPConnection;
     import com.tinkerforge.BrickletIndustrialAnalogOut;
 
