@@ -9,14 +9,14 @@ class Example
 	static void Main()
 	{
 		IPConnection ipcon = new IPConnection(); // Create IP connection
-		BrickletIndustrialAnalogOut ao = new BrickletIndustrialAnalogOut(UID, ipcon); // Create device object
+		BrickletIndustrialAnalogOut iao = new BrickletIndustrialAnalogOut(UID, ipcon); // Create device object
 
 		ipcon.Connect(HOST, PORT); // Connect to brickd
 		// Don't use device before ipcon is connected
 
 		// Set output current to 4.5mA
-		ao.SetCurrent(4500);
-		ao.Enable();
+		iao.SetCurrent(4500);
+		iao.Enable();
 
 		System.Console.WriteLine("Press enter to exit");
 		System.Console.ReadLine();

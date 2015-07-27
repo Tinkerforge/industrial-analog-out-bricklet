@@ -15,7 +15,7 @@ if __name__ == "__main__":
     ipcon.connect(HOST, PORT) # Connect to brickd
     # Don't use device before ipcon is connected
 
-    # Set output voltage of 3.3V
+    # Set output voltage to 3.3V
     iao.set_voltage(3300)
     iao.enable()
 
