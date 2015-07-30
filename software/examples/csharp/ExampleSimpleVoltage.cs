@@ -20,6 +20,7 @@ class Example
 
 		System.Console.WriteLine("Press enter to exit");
 		System.Console.ReadLine();
+		iao.Disable();
 		ipcon.Disconnect();
 	}
 }

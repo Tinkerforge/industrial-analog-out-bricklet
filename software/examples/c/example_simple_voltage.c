@@ -29,5 +29,6 @@ int main() {
 
 	printf("Press key to exit\n");
 	getchar();
+	industrial_analog_out_disable(&iao);
 	ipcon_destroy(&ipcon); // Calls ipcon_disconnect internally
 }
