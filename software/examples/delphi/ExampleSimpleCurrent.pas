@@ -1,4 +1,4 @@
-program ExampleSimple;
+program ExampleSimpleCurrent;
 
 {$ifdef MSWINDOWS}{$apptype CONSOLE}{$endif}
 {$ifdef FPC}{$mode OBJFPC}{$H+}{$endif}
@@ -10,7 +10,7 @@ type
   TExample = class
   private
     ipcon: TIPConnection;
-    ao: TBrickletIndustrialAnalogOut;
+    iao: TBrickletIndustrialAnalogOut;
   public
     procedure Execute;
   end;
@@ -29,18 +29,19 @@ begin
   ipcon := TIPConnection.Create;
 
   { Create device object }
-  ao := TBrickletIndustrialAnalogOut.Create(UID, ipcon);
+  iao := TBrickletIndustrialAnalogOut.Create(UID, ipcon);
 
   { Connect to brickd }
   ipcon.Connect(HOST, PORT);
   { Don't use device before ipcon is connected }
 
-  { Set a current of 4.5mA }
-  ao.SetCurrent(4500);
-  ao.Enable();
+  { Set output current to 4.5mA }
+  iao.SetCurrent(4500);
+  iao.Enable;
 
   WriteLn('Press key to exit');
   ReadLn;
+  iao.Disable;
   ipcon.Destroy; { Calls ipcon.Disconnect internally }
 end;
 
