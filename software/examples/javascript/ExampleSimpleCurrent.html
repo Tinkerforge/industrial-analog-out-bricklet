@@ -6,7 +6,7 @@
     </head>
     <body>
         <div style="text-align:center;">
-            <h1>Analog Out Bricklet Simple Example</h1>
+            <h1>Industrial Analog Out Bricklet Simple Current Example</h1>
             <p>
                 <input value="localhost" id="host" type="text" size="20">:
                 <input value="4280" id="port" type="text" size="5">,
@@ -31,19 +31,19 @@
                     ipcon.disconnect();
                 }
                 ipcon = new Tinkerforge.IPConnection(); // Create IP connection
-                var ao = new Tinkerforge.BrickletIndustrialAnalogOut(UID, ipcon); // Create device object
+                var iao = new Tinkerforge.BrickletIndustrialAnalogOut(UID, ipcon); // Create device object
                 ipcon.connect(HOST, PORT,
                     function(error) {
-                        textArea.value += 'Error: '+error+ '\n';
+                        textArea.value += 'Error: ' + error + '\n';
                     }
                 ); // Connect to brickd
                 // Don't use device before ipcon is connected
 
                 ipcon.on(Tinkerforge.IPConnection.CALLBACK_CONNECTED,
-                    function(connectReason) {
+                    function (connectReason) {
                         // Set output current to 4.5mA
-                        ao.setCurrent(4500);
-                        ao.enable();
+                        iao.setCurrent(4500);
+                        iao.enable();
                     }
                 );
             }

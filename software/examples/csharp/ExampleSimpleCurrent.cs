@@ -1,3 +1,4 @@
+using System;
 using Tinkerforge;
 
 class Example
@@ -9,7 +10,8 @@ class Example
 	static void Main()
 	{
 		IPConnection ipcon = new IPConnection(); // Create IP connection
-		BrickletIndustrialAnalogOut iao = new BrickletIndustrialAnalogOut(UID, ipcon); // Create device object
+		BrickletIndustrialAnalogOut iao =
+		  new BrickletIndustrialAnalogOut(UID, ipcon); // Create device object
 
 		ipcon.Connect(HOST, PORT); // Connect to brickd
 		// Don't use device before ipcon is connected
@@ -18,8 +20,8 @@ class Example
 		iao.SetCurrent(4500);
 		iao.Enable();
 
-		System.Console.WriteLine("Press enter to exit");
-		System.Console.ReadLine();
+		Console.WriteLine("Press enter to exit");
+		Console.ReadLine();
 		iao.Disable();
 		ipcon.Disconnect();
 	}

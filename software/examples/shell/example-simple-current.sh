@@ -1,9 +1,12 @@
 #!/bin/sh
-# connects to localhost:4223 by default, use --host and --port to change it
+# Connects to localhost:4223 by default, use --host and --port to change this
 
-# change to your UID
-uid=XYZ
+uid=XYZ # Change to your UID
 
-# set a current of 4.5mA
+# Set output current to 4.5mA
 tinkerforge call industrial-analog-out-bricklet $uid set-current 4500
 tinkerforge call industrial-analog-out-bricklet $uid enable
+
+echo "Press key to exit"; read dummy
+
+tinkerforge call industrial-analog-out-bricklet $uid disable

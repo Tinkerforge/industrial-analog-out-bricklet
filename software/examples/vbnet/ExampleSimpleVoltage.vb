@@ -1,3 +1,4 @@
+Imports System
 Imports Tinkerforge
 
 Module ExampleSimpleVoltage
@@ -16,8 +17,8 @@ Module ExampleSimpleVoltage
         iao.SetVoltage(3300)
         iao.Enable()
 
-        System.Console.WriteLine("Press key to exit")
-        System.Console.ReadLine()
+        Console.WriteLine("Press key to exit")
+        Console.ReadLine()
         iao.Disable()
         ipcon.Disconnect()
     End Sub

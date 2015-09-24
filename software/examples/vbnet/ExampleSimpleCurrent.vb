@@ -1,3 +1,4 @@
+Imports System
 Imports Tinkerforge
 
 Module ExampleSimpleCurrent
@@ -16,8 +17,8 @@ Module ExampleSimpleCurrent
         iao.SetCurrent(4500)
         iao.Enable()
 
-        System.Console.WriteLine("Press key to exit")
-        System.Console.ReadLine()
+        Console.WriteLine("Press key to exit")
+        Console.ReadLine()
         iao.Disable()
         ipcon.Disconnect()
     End Sub

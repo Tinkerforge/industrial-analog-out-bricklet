@@ -17,7 +17,7 @@ $ipcon->connect(&HOST, &PORT); # Connect to brickd
 $iao->set_voltage(3300);
 $iao->enable();
 
-print "Press any key to exit...\n";
+print "Press key to exit\n";
 <STDIN>;
 $iao->disable();
 $ipcon->disconnect();

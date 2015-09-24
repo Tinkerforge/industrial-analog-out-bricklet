@@ -11,17 +11,18 @@ const PORT = 4223;
 const UID = 'XYZ'; // Change to your UID
 
 $ipcon = new IPConnection(); // Create IP connection
-$ao = new BrickletIndustrialAnalogOut(UID, $ipcon); // Create device object
+$iao = new BrickletIndustrialAnalogOut(UID, $ipcon); // Create device object
 
 $ipcon->connect(HOST, PORT); // Connect to brickd
 // Don't use device before ipcon is connected
 
 // Set output current to 4.5mA
-$ao->setCurrent(4500);
-$ao->enable();
+$iao->setCurrent(4500);
+$iao->enable();
 
 echo "Press key to exit\n";
 fgetc(fopen('php://stdin', 'r'));
+$iao->disable();
 $ipcon->disconnect();
 
 ?>

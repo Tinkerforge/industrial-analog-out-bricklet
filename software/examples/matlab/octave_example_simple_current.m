@@ -3,18 +3,19 @@ function octave_example_simple_current()
 
     HOST = "localhost";
     PORT = 4223;
-    UID = "brY"; % Change to your UID
+    UID = "XYZ"; % Change to your UID
 
     ipcon = java_new("com.tinkerforge.IPConnection"); % Create IP connection
-    ao = java_new("com.tinkerforge.BrickletIndustrialAnalogOut", UID, ipcon); % Create device object
+    iao = java_new("com.tinkerforge.BrickletIndustrialAnalogOut", UID, ipcon); % Create device object
 
     ipcon.connect(HOST, PORT); % Connect to brickd
     % Don't use device before ipcon is connected
 
     % Set output current to 4.5mA
-    ao.setCurrent(4500);
-    ao.enable();
+    iao.setCurrent(4500);
+    iao.enable();
 
-    input("Press any key to exit...\n", "s");
+    input("Press key to exit\n", "s");
+    iao.disable();
     ipcon.disconnect();
 end

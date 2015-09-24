@@ -19,6 +19,6 @@ if __name__ == "__main__":
     iao.set_current(4500)
     iao.enable()
 
-    raw_input('Press key to exit\n') # Use input() in Python 3
+    raw_input("Press key to exit\n") # Use input() in Python 3
     iao.disable()
     ipcon.disconnect()
