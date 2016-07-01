@@ -4,7 +4,7 @@ function matlab_example_simple_voltage()
 
     HOST = 'localhost';
     PORT = 4223;
-    UID = 'XYZ'; % Change to your UID
+    UID = 'XYZ'; % Change XYZ to the UID of your Industrial Analog Out Bricklet
 
     ipcon = IPConnection(); % Create IP connection
     iao = handle(BrickletIndustrialAnalogOut(UID, ipcon), 'CallbackProperties'); % Create device object

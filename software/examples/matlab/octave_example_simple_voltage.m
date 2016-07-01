@@ -3,7 +3,7 @@ function octave_example_simple_voltage()
 
     HOST = "localhost";
     PORT = 4223;
-    UID = "XYZ"; % Change to your UID
+    UID = "XYZ"; % Change XYZ to the UID of your Industrial Analog Out Bricklet
 
     ipcon = java_new("com.tinkerforge.IPConnection"); % Create IP connection
     iao = java_new("com.tinkerforge.BrickletIndustrialAnalogOut", UID, ipcon); % Create device object

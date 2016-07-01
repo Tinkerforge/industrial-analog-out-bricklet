@@ -8,7 +8,7 @@ use Tinkerforge\BrickletIndustrialAnalogOut;
 
 const HOST = 'localhost';
 const PORT = 4223;
-const UID = 'XYZ'; // Change to your UID
+const UID = 'XYZ'; // Change XYZ to the UID of your Industrial Analog Out Bricklet
 
 $ipcon = new IPConnection(); // Create IP connection
 $iao = new BrickletIndustrialAnalogOut(UID, $ipcon); // Create device object
