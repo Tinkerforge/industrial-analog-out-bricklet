@@ -11,7 +11,6 @@ LIBS:cmos4000
 LIBS:adc-dac
 LIBS:memory
 LIBS:xilinx
-LIBS:special
 LIBS:microcontrollers
 LIBS:dsp
 LIBS:microchip
@@ -30,7 +29,6 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:industrial-analog-out-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
@@ -996,7 +994,7 @@ F 1 "10µH" V 3050 5850 40  0000 C CNN
 F 2 "kicad-libraries:NR3030" H 2950 5850 60  0001 C CNN
 F 3 "" H 2950 5850 60  0000 C CNN
 	1    2950 5850
-	0    1    -1   0   
+	-1   0    0    -1  
 $EndComp
 $Comp
 L GND #PWR9
