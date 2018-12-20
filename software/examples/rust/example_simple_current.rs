@@ -1,6 +1,8 @@
-use std::{error::Error, io};
+use std::{io, error::Error};
 
-use tinkerforge::{industrial_analog_out_bricklet::*, ip_connection::IpConnection};
+use tinkerforge::{ip_connection::IpConnection, 
+                  industrial_analog_out_bricklet::*};
+
 
 const HOST: &str = "localhost";
 const PORT: u16 = 4223;
@@ -11,16 +13,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     let iao = IndustrialAnalogOutBricklet::new(UID, &ipcon); // Create device object.
 
     ipcon.connect((HOST, PORT)).recv()??; // Connect to brickd.
-                                          // Don't use device before ipcon is connected.
+    // Don't use device before ipcon is connected.
 
-    // Set output current to 4.5mA
-    iao.set_current(4500);
-    iao.enable();
+		// Set output current to 4.5mA
+		iao.set_current(4500);
+		iao.enable();
 
     println!("Press enter to exit.");
     let mut _input = String::new();
     io::stdin().read_line(&mut _input)?;
-    iao.disable();
+		iao.disable();
     ipcon.disconnect();
     Ok(())
 }
