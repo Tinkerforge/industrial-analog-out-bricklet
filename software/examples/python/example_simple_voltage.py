@@ -20,5 +20,7 @@ if __name__ == "__main__":
     iao.enable()
 
     input("Press key to exit\n") # Use raw_input() in Python 2
+
     iao.disable()
+
     ipcon.disconnect()

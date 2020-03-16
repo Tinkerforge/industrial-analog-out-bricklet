@@ -22,7 +22,9 @@ $iao->enable();
 
 echo "Press key to exit\n";
 fgetc(fopen('php://stdin', 'r'));
+
 $iao->disable();
+
 $ipcon->disconnect();
 
 ?>

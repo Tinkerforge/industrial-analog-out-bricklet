@@ -23,7 +23,9 @@ public class ExampleSimpleVoltage {
 		iao.enable();
 
 		System.out.println("Press key to exit"); System.in.read();
+
 		iao.disable();
+
 		ipcon.disconnect();
 	}
 }

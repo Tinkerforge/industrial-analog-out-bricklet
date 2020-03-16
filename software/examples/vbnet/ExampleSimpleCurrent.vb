@@ -19,7 +19,9 @@ Module ExampleSimpleCurrent
 
         Console.WriteLine("Press key to exit")
         Console.ReadLine()
+
         iao.Disable()
+
         ipcon.Disconnect()
     End Sub
 End Module

@@ -16,6 +16,8 @@ function octave_example_simple_current()
     iao.enable();
 
     input("Press key to exit\n", "s");
+
     iao.disable();
+
     ipcon.disconnect();
 end

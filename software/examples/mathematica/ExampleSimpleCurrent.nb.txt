@@ -16,8 +16,8 @@ iao@Enable[]
 
 Input["Click OK to exit"]
 
-(*Clean up*)
 iao@Disable[]
+
 ipcon@Disconnect[]
 ReleaseNETObject[iao]
 ReleaseNETObject[ipcon]

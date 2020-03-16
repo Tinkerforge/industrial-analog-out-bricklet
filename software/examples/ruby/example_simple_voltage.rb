@@ -22,5 +22,7 @@ iao.enable
 
 puts 'Press key to exit'
 $stdin.gets
+
 iao.disable
+
 ipcon.disconnect
